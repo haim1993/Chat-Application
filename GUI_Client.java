@@ -1,17 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package chatapplication;
 
 import java.awt.event.KeyEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -19,17 +12,22 @@ import java.util.logging.Logger;
  */
 public class GUI_Client extends javax.swing.JFrame {
 
-    static Socket client;
-    static DataInputStream dis;
-    static DataOutputStream dos;
+    private Client client;
     static String NAME = "";
-    static String IP = "";
+    static String IP = "127.0.0.1";
+    static int PORT = 6060;
+    static DefaultListModel dlm;
 
     /**
      * Creates new form GUI_Client
+     *
+     * @param dlm
      */
-    public GUI_Client() {
+    public GUI_Client(DefaultListModel<String> dlm) {
         initComponents();
+        startClient();
+        this.dlm = dlm;
+        updateOnlineClients();
     }
 
     /**
@@ -41,20 +39,30 @@ public class GUI_Client extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panel_chat = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtArea_chat = new javax.swing.JTextArea();
         txt_send = new javax.swing.JTextField();
         btn_send = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        btn_reconnect = new javax.swing.JButton();
+        lbl_chat = new javax.swing.JLabel();
+        panel_online = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
         list_online = new javax.swing.JList<>();
+        lbl_online = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Client");
+
+        panel_chat.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(102, 102, 102), 1, true));
 
         txtArea_chat.setColumns(20);
         txtArea_chat.setRows(5);
         txtArea_chat.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtArea_chat.setEnabled(false);
         jScrollPane1.setViewportView(txtArea_chat);
+        DefaultCaret caret = (DefaultCaret) txtArea_chat.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         txt_send.setText("Type here...");
         txt_send.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -75,7 +83,91 @@ public class GUI_Client extends javax.swing.JFrame {
             }
         });
 
-        jScrollPane2.setViewportView(list_online);
+        btn_reconnect.setText("Reconnect");
+        btn_reconnect.setEnabled(false);
+        btn_reconnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_reconnectActionPerformed(evt);
+            }
+        });
+
+        lbl_chat.setFont(new java.awt.Font("Arial", 2, 18)); // NOI18N
+        lbl_chat.setText("Broadcast");
+
+        javax.swing.GroupLayout panel_chatLayout = new javax.swing.GroupLayout(panel_chat);
+        panel_chat.setLayout(panel_chatLayout);
+        panel_chatLayout.setHorizontalGroup(
+            panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_chatLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_chatLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_chatLayout.createSequentialGroup()
+                                .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_send, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_chatLayout.createSequentialGroup()
+                        .addComponent(lbl_chat)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_reconnect, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        panel_chatLayout.setVerticalGroup(
+            panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_chatLayout.createSequentialGroup()
+                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_chatLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btn_reconnect)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_chatLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbl_chat)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_send)
+                    .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        panel_online.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(102, 102, 102), 1, true));
+
+        list_online.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                list_onlineMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(list_online);
+
+        lbl_online.setFont(new java.awt.Font("Arial", 2, 18)); // NOI18N
+        lbl_online.setText("Online");
+
+        javax.swing.GroupLayout panel_onlineLayout = new javax.swing.GroupLayout(panel_online);
+        panel_online.setLayout(panel_onlineLayout);
+        panel_onlineLayout.setHorizontalGroup(
+            panel_onlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_onlineLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_onlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(panel_onlineLayout.createSequentialGroup()
+                        .addComponent(lbl_online)
+                        .addGap(0, 78, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        panel_onlineLayout.setVerticalGroup(
+            panel_onlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_onlineLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbl_online)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -83,48 +175,42 @@ public class GUI_Client extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_send)))
+                .addComponent(panel_online, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 9, Short.MAX_VALUE))
+                .addComponent(panel_chat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btn_send)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
-                        .addContainerGap())))
+                    .addComponent(panel_online, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel_chat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void startClient() {
+        client = new Client(IP, PORT, this);
+        new Thread(client).start();
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Client " + client.getPort());
+        append("Welcome to the chat room!\n");
+    }
+
     private void btn_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sendActionPerformed
-        try {
-            String msg = "";
-            msg = txt_send.getText();
-            if (!msg.equals("")) {
-                txt_send.setText("");
-                txtArea_chat.append(NAME + "Me : " + msg + "\n");
-                dos.writeUTF(msg);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
+        String msg = txt_send.getText();
+        txt_send.setText("");
+        append("Me : " + msg + "\n");
+        client.sendTo(msg, lbl_chat.getText());
+        if (msg.equals("bye")) {
+            append("To re-enter chat room click 'Reconnect'.\n");
+            client.stop();
+            btn_reconnect.setEnabled(true);
+            return;
         }
     }//GEN-LAST:event_btn_sendActionPerformed
 
@@ -132,94 +218,108 @@ public class GUI_Client extends javax.swing.JFrame {
         if (txt_send.getText().equals("Type here...")) {
             txt_send.setText("");
         }
+        if (!list_online.isSelectionEmpty()) {
+            this.lbl_chat.setText(list_online.getSelectedValue());
+        }
     }//GEN-LAST:event_txt_sendMouseClicked
 
     private void txt_sendKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_sendKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            try {
-                String msg = "";
-                msg = txt_send.getText();
-                if (!msg.equals("")) {
-                    txt_send.setText("");
-                    txtArea_chat.append(NAME + "Me : " + msg + "\n");
-                    dos.writeUTF(msg);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
+            String msg = txt_send.getText();
+            txt_send.setText("");
+            append("Me : " + msg + "\n");
+            client.sendTo(msg, lbl_chat.getText());
+            if (msg.equals("bye")) {
+                append("To re-enter chat room click 'Reconnect'.\n");
+                client.stop();
+                btn_reconnect.setEnabled(true);
+                return;
             }
         }
     }//GEN-LAST:event_txt_sendKeyPressed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void btn_reconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_reconnectActionPerformed
+        startClient();
+        btn_reconnect.setEnabled(false);
+    }//GEN-LAST:event_btn_reconnectActionPerformed
+
+    private void list_onlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_onlineMouseClicked
+        if (!list_online.isSelectionEmpty()) {
+            lbl_chat.setText(list_online.getSelectedValue());
         }
-        //</editor-fold>
+    }//GEN-LAST:event_list_onlineMouseClicked
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GUI_Client().setVisible(true);
-            }
-        });
-
-        try {
-            client = new Socket(IP, GUI_Server.PORT);
-            dis = new DataInputStream(client.getInputStream());
-            dos = new DataOutputStream(client.getOutputStream());
-            String msg = "";
-            while (!msg.equals("exit")) {
-                msg = dis.readUTF();
-                txtArea_chat.append("Server : " + msg + "\n");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+    public void append(String message) {
+        txtArea_chat.append(message);
     }
 
+    public void updateOnlineClients() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (client.isAlive()) {
+                    DefaultListModel<String> tempDLM = new DefaultListModel<String>();
+                    tempDLM.addElement("Broadcast");
+                    for (int i = 0; i < dlm.size(); i++) {
+                        if (!dlm.elementAt(i).equals(client.getPort() + "")) {
+                            tempDLM.addElement((String) dlm.elementAt(i));
+                        }
+                    }
+                    list_online.setModel(tempDLM);
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }).start();
+    }
+
+//    public static void startGUI() {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                new GUI_Client().setVisible(true);
+//            }
+//        });
+//    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_reconnect;
     private javax.swing.JButton btn_send;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private static javax.swing.JList<String> list_online;
-    private static javax.swing.JTextArea txtArea_chat;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lbl_chat;
+    private javax.swing.JLabel lbl_online;
+    private javax.swing.JList<String> list_online;
+    private javax.swing.JPanel panel_chat;
+    private javax.swing.JPanel panel_online;
+    private javax.swing.JTextArea txtArea_chat;
     private javax.swing.JTextField txt_send;
     // End of variables declaration//GEN-END:variables
 
-    public static void communicate() {
-        try {
-            client = new Socket(IP, GUI_Server.PORT);
-            dis = new DataInputStream(client.getInputStream());
-            dos = new DataOutputStream(client.getOutputStream());
-            String msg = "";
-            while (!msg.equals("exit")) {
-                msg = dis.readUTF();
-                txtArea_chat.append("Server : " + msg + "\n");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

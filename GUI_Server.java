@@ -1,20 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package chatapplication;
 
-import static chatapplication.GUI_Client.dos;
-import java.awt.event.KeyEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -22,12 +9,7 @@ import javax.swing.DefaultListModel;
  */
 public class GUI_Server extends javax.swing.JFrame {
 
-    static ServerSocket server;
-    static Socket client;
-    static DataInputStream dis;
-    static DataOutputStream dos;
-
-    static DefaultListModel dlm = new DefaultListModel();
+    private Server server;
 
     static int PORT = 6060;
     static String IP = "127.0.0.1";
@@ -37,6 +19,8 @@ public class GUI_Server extends javax.swing.JFrame {
      */
     public GUI_Server() {
         initComponents();
+        server = new Server(PORT, this);
+        startServer();
     }
 
     /**
@@ -52,37 +36,41 @@ public class GUI_Server extends javax.swing.JFrame {
         txtArea_chat = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         list_online = new javax.swing.JList<>();
-        btn_send = new javax.swing.JButton();
-        txt_send = new javax.swing.JTextField();
+        btn_start = new javax.swing.JButton();
+        btn_stop = new javax.swing.JButton();
+        lbl_online = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Server");
 
         txtArea_chat.setColumns(20);
         txtArea_chat.setRows(5);
         txtArea_chat.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         txtArea_chat.setEnabled(false);
         jScrollPane1.setViewportView(txtArea_chat);
+        DefaultCaret caret = (DefaultCaret) txtArea_chat.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         jScrollPane2.setViewportView(list_online);
 
-        btn_send.setText("Send");
-        btn_send.addActionListener(new java.awt.event.ActionListener() {
+        btn_start.setText("Start");
+        btn_start.setVisible(false);
+        btn_start.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_sendActionPerformed(evt);
+                btn_startActionPerformed(evt);
             }
         });
 
-        txt_send.setText("Type here...");
-        txt_send.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txt_sendMouseClicked(evt);
+        btn_stop.setText("Stop");
+        btn_stop.setVisible(true);
+        btn_stop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_stopActionPerformed(evt);
             }
         });
-        txt_send.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_sendKeyPressed(evt);
-            }
-        });
+
+        lbl_online.setFont(new java.awt.Font("Arial", 2, 18)); // NOI18N
+        lbl_online.setText("Online");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -91,72 +79,75 @@ public class GUI_Server extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbl_online)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_start)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_send)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 9, Short.MAX_VALUE))
+                        .addComponent(btn_stop)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btn_send)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(txt_send, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
-                        .addContainerGap())))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btn_start)
+                        .addComponent(btn_stop))
+                    .addComponent(lbl_online, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sendActionPerformed
-        try {
-            String msg = "";
-            msg = txt_send.getText();
-            if (!msg.equals("")) {
-                txt_send.setText("");
-                txtArea_chat.append("Me : " + msg + "\n");
-                dos.writeUTF(msg);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_btn_sendActionPerformed
+    private void startServer() {
+        new Thread(server).start();
+        append("Waiting for clients...\n");
+        //String msg;
+    }
 
-    private void txt_sendMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_sendMouseClicked
-        if (txt_send.getText().equals("Type here...")) {
-            txt_send.setText("");
-        }
-    }//GEN-LAST:event_txt_sendMouseClicked
+    private void btn_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_startActionPerformed
+        btn_start.setVisible(false);
+        btn_stop.setVisible(true);
+        append("Waiting for clients...\n");
+    }//GEN-LAST:event_btn_startActionPerformed
 
-    private void txt_sendKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_sendKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            try {
-                String msg = "";
-                msg = txt_send.getText();
-                if (!msg.equals("")) {
-                    txt_send.setText("");
-                    txtArea_chat.append("Me : " + msg + "\n");
-                    dos.writeUTF(msg);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+    private void btn_stopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_stopActionPerformed
+        btn_stop.setVisible(false);
+        btn_start.setVisible(true);
+    }//GEN-LAST:event_btn_stopActionPerformed
 
-    }//GEN-LAST:event_txt_sendKeyPressed
+    public void append(String message) {
+        txtArea_chat.append(message);
+    }
+
+    public DefaultListModel<String> getList() {
+        return server.getClientList();
+    }
+    
+    public void updateOnlineClients() {
+        list_online.setModel(server.getClientList());
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_start;
+    private javax.swing.JButton btn_stop;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbl_online;
+    private javax.swing.JList<String> list_online;
+    private javax.swing.JTextArea txtArea_chat;
+    // End of variables declaration//GEN-END:variables
 
     /**
      * @param args the command line arguments
@@ -187,61 +178,13 @@ public class GUI_Server extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new GUI_Server().setVisible(true);
+                GUI_Server gui = new GUI_Server();
+                gui.setVisible(true);
+                new Login(gui).setVisible(true);
             }
         });
-        Server server = new Server();
-        server.ALIVE = true;
-        Thread server_thread = new Thread(server);
-        server_thread.start();
-
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_send;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private static javax.swing.JList<String> list_online;
-    private static javax.swing.JTextArea txtArea_chat;
-    private javax.swing.JTextField txt_send;
-    // End of variables declaration//GEN-END:variables
-
-    public static void communicate() {
-        try {
-            server = new ServerSocket(PORT);
-            txtArea_chat.append("Waiting for users...\n");
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            client = server.accept();
-            txtArea_chat.append("Client joined\n");
-            dlm.addElement("Client");
-            list_online.setModel(dlm);
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            dis = new DataInputStream(client.getInputStream());
-            dos = new DataOutputStream(client.getOutputStream());
-            String msg = "";
-            while (!(msg = dis.readUTF()).equals("exit")) {
-                txtArea_chat.append("Client : " + msg + "\n");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            txtArea_chat.append("Client left\n");
-            dlm.remove(dlm.indexOf("Client"));
-            client.close();
-        } catch (IOException ex) {
-            Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
 }
