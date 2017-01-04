@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -38,7 +39,11 @@ public class Server implements Runnable {
                 String msg;
                 while ((msg = dis.readUTF()) != null) {
                     this.gui.append(client.getPort() + " : " + msg + "\n");
-                    messages.add(msg);
+                    try {
+                        messages.put(msg);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     if (msg.equals("bye")) {
                         break;
                     }
@@ -57,25 +62,78 @@ public class Server implements Runnable {
                 public void run() {
                     try {
                         dos = new DataOutputStream(client.getOutputStream());
+                        myMessages();
                     } catch (IOException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                }
+            }).start();
+        }
+
+        public void myMessages() {
+            while (!client.isClosed()) {
+                BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+                copyQueue(queue);
+                int size = queue.size();
+                for (int i = 0; i < size; i++) {
                     try {
-                        for (int i = 0; i < messages.size(); i++) {
-                            String message = messages.take();
+                        String msg = queue.take();
+                        int clientPort = parseMessage(msg);
+                        if (clientPort == client.getPort()) { //--The message will be send solely to this port.
                             try {
-                                dos.writeUTF(message);
+                                dos.writeUTF(msg);
                             } catch (IOException ex) {
                                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                             }
+                            messages.remove(msg);
+                        } else if (clientPort == (-1)) { //--Broadcast. Send to all ports.
+                            try {
+                                dos.writeUTF(msg);
+                                Thread.sleep(100); //--To prevent deleting a broadcast message too fast.
+                            } catch (IOException ex) {
+                                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            messages.remove(msg);
+                            queue.remove(msg);
+                        } else { //--Was not sent to this port.
+                            queue.remove(msg);
                         }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
                 }
-            }).start();
+            }
         }
+
+        /*
+         * Copies messages to given queue.
+         * Returns the given queue, containing messages.
+         */
+        public void copyQueue(BlockingQueue<String> queue) {
+            messages.forEach((message) -> {
+                try {
+                    queue.put(message);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+        }
+
+        /*
+         * Reads the message sent to server and returns
+         * the topic of the message (Port number, or Broadcast - All).
+         * Return -1 if meant for Broadcast.
+         */
+        public int parseMessage(String message) {
+            int start = message.indexOf('<');
+            int end = message.indexOf('>');
+            String port = message.substring(start + 1, end);
+            if (!port.equals("Broadcast")) {
+                return Integer.parseInt(port);
+            }
+            return -1;
+        }
+
     }
 
     private ServerSocket server;

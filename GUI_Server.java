@@ -53,6 +53,7 @@ public class GUI_Server extends javax.swing.JFrame {
 
         jScrollPane2.setViewportView(list_online);
 
+        btn_start.setBackground(new java.awt.Color(102, 255, 51));
         btn_start.setText("Start");
         btn_start.setVisible(false);
         btn_start.addActionListener(new java.awt.event.ActionListener() {
@@ -61,6 +62,7 @@ public class GUI_Server extends javax.swing.JFrame {
             }
         });
 
+        btn_stop.setBackground(new java.awt.Color(255, 102, 102));
         btn_stop.setText("Stop");
         btn_stop.setVisible(true);
         btn_stop.addActionListener(new java.awt.event.ActionListener() {

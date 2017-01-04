@@ -38,7 +38,7 @@ public class Client implements Runnable {
             dos = new DataOutputStream(client.getOutputStream());
             String msg;
             while ((msg = dis.readUTF()) != null) {
-                this.gui.append(client.getPort() + " : " + msg + "\n");
+                this.gui.append("Someone : " + msg + "\n");
             }
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
