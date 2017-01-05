@@ -215,9 +215,6 @@ public class GUI_Client extends javax.swing.JFrame {
         if (txt_send.getText().equals("Type here...")) {
             txt_send.setText("");
         }
-        if (!list_online.isSelectionEmpty()) {
-            this.lbl_chat.setText(list_online.getSelectedValue());
-        }
     }//GEN-LAST:event_txt_sendMouseClicked
 
     private void txt_sendKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_sendKeyPressed
@@ -243,7 +240,10 @@ public class GUI_Client extends javax.swing.JFrame {
     private void list_onlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_onlineMouseClicked
         if (!list_online.isSelectionEmpty()) {
             lbl_chat.setText(list_online.getSelectedValue());
+            txt_send.setText("");
+            txt_send.requestFocusInWindow();
         }
+        
     }//GEN-LAST:event_list_onlineMouseClicked
 
     public void append(String message) {
