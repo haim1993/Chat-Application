@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -37,8 +36,8 @@ public class Server implements Runnable {
                 dis = new DataInputStream(client.getInputStream());
                 findMessage();
                 String msg;
-                while ((msg = dis.readUTF()) != null) {
-                    this.gui.append(client.getPort() + " : " + msg + "\n");
+                while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
+                    //this.gui.append(client.getPort() + " : " + msg + "\n");
                     try {
                         messages.put(msg);
                     } catch (InterruptedException ex) {
@@ -78,17 +77,19 @@ public class Server implements Runnable {
                 for (int i = 0; i < size; i++) {
                     try {
                         String msg = queue.take();
-                        int clientPort = parseMessage(msg);
+                        
+                        int clientPort = parseMessageDesignation(msg);
+                        String message = passMessage(msg);
                         if (clientPort == client.getPort()) { //--The message will be send solely to this port.
                             try {
-                                dos.writeUTF(msg);
+                                dos.writeUTF(message);
                             } catch (IOException ex) {
                                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                             }
                             messages.remove(msg);
                         } else if (clientPort == (-1)) { //--Broadcast. Send to all ports.
                             try {
-                                dos.writeUTF(msg);
+                                dos.writeUTF(message);
                                 Thread.sleep(100); //--To prevent deleting a broadcast message too fast.
                             } catch (IOException ex) {
                                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,7 +125,7 @@ public class Server implements Runnable {
          * the topic of the message (Port number, or Broadcast - All).
          * Return -1 if meant for Broadcast.
          */
-        public int parseMessage(String message) {
+        public int parseMessageDesignation(String message) {
             int start = message.indexOf('<');
             int end = message.indexOf('>');
             String port = message.substring(start + 1, end);
@@ -132,6 +133,23 @@ public class Server implements Runnable {
                 return Integer.parseInt(port);
             }
             return -1;
+        }
+
+        /*
+         * Reads the message sent to server and returns
+         * the source of the message (Port number of sender).
+         */
+        public int parseMessageSource(String message) {
+            int start = message.indexOf('(');
+            int end = message.indexOf(')');
+            String port = message.substring(start + 1, end);
+            return Integer.parseInt(port);
+        }
+        
+        public String passMessage(String str) {
+            int start = str.indexOf('>');
+            String port = parseMessageSource(str) + "";
+            return port + " : " + str.substring(start + 2);
         }
 
     }
@@ -160,6 +178,7 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
+        this.ALIVE = true;
         while (ALIVE) {
             try {
                 this.client = this.server.accept();
@@ -174,7 +193,7 @@ public class Server implements Runnable {
             } catch (IOException ex) {
                 Logger.getLogger(Server.class
                         .getName()).log(Level.SEVERE, null, ex);
-                stop();
+                break;
             }
         }
         this.gui.append("Server stopped working.\n");
@@ -213,6 +232,12 @@ public class Server implements Runnable {
      */
     public void stop() {
         this.ALIVE = false;
+        try {
+            this.client.close();
+            //this.server.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

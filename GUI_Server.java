@@ -120,13 +120,15 @@ public class GUI_Server extends javax.swing.JFrame {
 
     private void btn_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_startActionPerformed
         btn_start.setVisible(false);
-        btn_stop.setVisible(true);
-        append("Waiting for clients...\n");
+        btn_stop.setVisible(true);        
+        startServer();
     }//GEN-LAST:event_btn_startActionPerformed
 
     private void btn_stopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_stopActionPerformed
         btn_stop.setVisible(false);
         btn_start.setVisible(true);
+        append("Server stopped working.\n");
+        server.stop();
     }//GEN-LAST:event_btn_stopActionPerformed
 
     public void append(String message) {

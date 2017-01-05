@@ -37,8 +37,10 @@ public class Client implements Runnable {
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
             String msg;
-            while ((msg = dis.readUTF()) != null) {
-                this.gui.append("Someone : " + msg + "\n");
+            while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
+                if (parseMessageSource(msg) != client.getLocalPort()) {
+                    this.gui.append(msg + "\n");
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -47,7 +49,7 @@ public class Client implements Runnable {
 
     public void sendTo(String message, String designation) {
         try {
-            dos.writeUTF("<" + designation + "> " + message);
+            dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -64,18 +66,29 @@ public class Client implements Runnable {
      * Stops the running client from operating.
      */
     public void stop() {
+        this.ALIVE = false;
         try {
             this.client.close();
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /*
      * Returns the value of the private variable ALIVE.
      */
     public boolean isAlive() {
         return this.ALIVE;
+    }
+
+    /*
+     * Reads the message sent to server and returns
+     * the source of the message (Port number of sender).
+     */
+    public int parseMessageSource(String message) {
+        int start = message.indexOf(':');
+        String port = message.substring(0, start - 1);
+        return Integer.parseInt(port);
     }
 
 }
