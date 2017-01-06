@@ -1,4 +1,3 @@
-package chatapplication;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -37,7 +36,6 @@ public class Server implements Runnable {
                 findMessage();
                 String msg;
                 while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
-                    //this.gui.append(client.getPort() + " : " + msg + "\n");
                     try {
                         messages.put(msg);
                     } catch (InterruptedException ex) {
@@ -81,13 +79,13 @@ public class Server implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+                BlockingQueue<String> queue = new LinkedBlockingQueue<>();
                 copyQueue(queue);
                 int size = queue.size();
                 for (int i = 0; i < size; i++) {
                     try {
                         String msg = queue.take();
-                        
+
                         int clientPort = parseMessageDesignation(msg);
                         String message = passMessage(msg);
                         if (clientPort == client.getPort()) { //--The message will be send solely to this port.
@@ -155,7 +153,11 @@ public class Server implements Runnable {
             String port = message.substring(start + 1, end);
             return Integer.parseInt(port);
         }
-        
+
+        /*
+         * Returns the message the way it shows on clients screen.
+         * Who sent it, and what is the content.
+         */
         public String passMessage(String str) {
             int start = str.indexOf('>');
             String port = parseMessageSource(str) + "";
@@ -180,10 +182,10 @@ public class Server implements Runnable {
             Logger.getLogger(Server.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
-        dlm = new DefaultListModel<String>();
+        dlm = new DefaultListModel<>();
         this.gui = gui;
         this.ALIVE = true;
-        messages = new LinkedBlockingQueue<String>();
+        messages = new LinkedBlockingQueue<>();
     }
 
     @Override

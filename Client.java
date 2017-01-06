@@ -1,4 +1,3 @@
-package chatapplication;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -29,7 +28,7 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        dlm = new DefaultListModel<String>();
+        dlm = new DefaultListModel<>();
     }
 
     @Override
@@ -42,8 +41,7 @@ public class Client implements Runnable {
                 if ((msg.charAt(0) == '[') && (msg.charAt(msg.length() - 1) == ']')) {
                     convertStringToList(msg);
                     gui.updateOnlineClients(this.dlm);
-                }
-                else if (parseMessageSource(msg) != client.getLocalPort()) {
+                } else if (parseMessageSource(msg) != client.getLocalPort()) {
                     this.gui.append(msg + "\n");
                 }
             }
@@ -52,6 +50,10 @@ public class Client implements Runnable {
         }
     }
 
+    /*
+     * Input : An existing list represeted by it's toString.
+     * Updates : Add to existing list all port number that are in the list variable.
+     */
     public void convertStringToList(String list) {
         dlm.removeAllElements();
         list = list.substring(1, list.length() - 1);
@@ -59,9 +61,13 @@ public class Client implements Runnable {
         for (String port : ports) {
             dlm.addElement(port);
         }
-        
+
     }
-    
+
+    /*
+     * To whom the message is meant to.
+     * Here we send the message with a designated port.
+     */
     public void sendTo(String message, String designation) {
         try {
             dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);

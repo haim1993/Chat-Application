@@ -1,4 +1,3 @@
-package chatapplication;
 
 import javax.swing.DefaultListModel;
 import javax.swing.text.DefaultCaret;
@@ -112,15 +111,17 @@ public class GUI_Server extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /*
+     * This method calls the thread in object Server.
+     */
     private void startServer() {
         new Thread(server).start();
         append("Waiting for clients...\n");
-        //String msg;
     }
 
     private void btn_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_startActionPerformed
         btn_start.setVisible(false);
-        btn_stop.setVisible(true);        
+        btn_stop.setVisible(true);
         startServer();
     }//GEN-LAST:event_btn_startActionPerformed
 
@@ -131,14 +132,23 @@ public class GUI_Server extends javax.swing.JFrame {
         server.stop();
     }//GEN-LAST:event_btn_stopActionPerformed
 
+    /*
+     * Appends messages to the server screen.
+     */
     public void append(String message) {
         txtArea_chat.append(message);
     }
 
+    /*
+     * Return most updated online contact list.
+     */
     public DefaultListModel<String> getList() {
         return server.getClientList();
     }
-    
+
+    /*
+     * Sets the model of the server list to be the updated online contact list.
+     */
     public void updateOnlineClients() {
         list_online.setModel(server.getClientList());
     }
@@ -184,8 +194,7 @@ public class GUI_Server extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                GUI_Server gui = new GUI_Server();
-                gui.setVisible(true);
+                new GUI_Server().setVisible(true);
             }
         });
     }

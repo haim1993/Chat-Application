@@ -1,4 +1,3 @@
-package chatapplication;
 
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
@@ -19,8 +18,6 @@ public class GUI_Client extends javax.swing.JFrame {
 
     /**
      * Creates new form GUI_Client
-     *
-     * 
      */
     public GUI_Client() {
         initComponents();
@@ -187,6 +184,9 @@ public class GUI_Client extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /*
+     * Starts the client socket.
+     */
     private void startClient() {
         client = new Client(IP, PORT, this);
         new Thread(client).start();
@@ -240,13 +240,20 @@ public class GUI_Client extends javax.swing.JFrame {
             txt_send.setText("");
             txt_send.requestFocusInWindow();
         }
-        
+
     }//GEN-LAST:event_list_onlineMouseClicked
 
+    /*
+     * Appends messages to the client screen.
+     */
     public void append(String message) {
         txtArea_chat.append(message);
     }
 
+    /*
+     * Runs a thread that continuously updates the contact
+     * list on the client side.
+     */
     public void updateOnlineClients(DefaultListModel<String> dlm) {
         new Thread(new Runnable() {
             @Override
@@ -269,38 +276,6 @@ public class GUI_Client extends javax.swing.JFrame {
             }
         }).start();
     }
-
-//    public static void startGUI() {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(GUI_Client.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                new GUI_Client().setVisible(true);
-//            }
-//        });
-//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_reconnect;

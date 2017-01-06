@@ -1,6 +1,3 @@
-package chatapplication;
-
-import javax.swing.DefaultListModel;
 
 /**
  *
@@ -12,7 +9,7 @@ public class Login extends javax.swing.JFrame {
      * Creates new form Login
      */
     public Login() {
-        initComponents();        
+        initComponents();
     }
 
     /**
@@ -90,6 +87,9 @@ public class Login extends javax.swing.JFrame {
         this.startClient();
     }//GEN-LAST:event_btn_connectActionPerformed
 
+    /*
+     * Starts the client GUI.
+     */
     public void startClient() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -121,7 +121,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_connect;
     private javax.swing.JLabel lbl_ip;
