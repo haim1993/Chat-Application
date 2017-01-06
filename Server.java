@@ -71,6 +71,16 @@ public class Server implements Runnable {
 
         public void myMessages() {
             while (!client.isClosed()) {
+                try {
+                    dos.writeUTF(dlm.toString());
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
                 copyQueue(queue);
                 int size = queue.size();

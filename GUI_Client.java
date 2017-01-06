@@ -16,18 +16,15 @@ public class GUI_Client extends javax.swing.JFrame {
     static String NAME = "";
     static String IP = "127.0.0.1";
     static int PORT = 6060;
-    static DefaultListModel dlm;
 
     /**
      * Creates new form GUI_Client
      *
-     * @param dlm
+     * 
      */
-    public GUI_Client(DefaultListModel<String> dlm) {
+    public GUI_Client() {
         initComponents();
         startClient();
-        this.dlm = dlm;
-        updateOnlineClients();
     }
 
     /**
@@ -250,7 +247,7 @@ public class GUI_Client extends javax.swing.JFrame {
         txtArea_chat.append(message);
     }
 
-    public void updateOnlineClients() {
+    public void updateOnlineClients(DefaultListModel<String> dlm) {
         new Thread(new Runnable() {
             @Override
             public void run() {

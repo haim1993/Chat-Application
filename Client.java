@@ -29,6 +29,7 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+        dlm = new DefaultListModel<String>();
     }
 
     @Override
@@ -38,7 +39,11 @@ public class Client implements Runnable {
             dos = new DataOutputStream(client.getOutputStream());
             String msg;
             while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
-                if (parseMessageSource(msg) != client.getLocalPort()) {
+                if ((msg.charAt(0) == '[') && (msg.charAt(msg.length() - 1) == ']')) {
+                    convertStringToList(msg);
+                    gui.updateOnlineClients(this.dlm);
+                }
+                else if (parseMessageSource(msg) != client.getLocalPort()) {
                     this.gui.append(msg + "\n");
                 }
             }
@@ -47,6 +52,16 @@ public class Client implements Runnable {
         }
     }
 
+    public void convertStringToList(String list) {
+        dlm.removeAllElements();
+        list = list.substring(1, list.length() - 1);
+        String[] ports = list.split(", ");
+        for (String port : ports) {
+            dlm.addElement(port);
+        }
+        
+    }
+    
     public void sendTo(String message, String designation) {
         try {
             dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);

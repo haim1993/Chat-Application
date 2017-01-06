@@ -186,7 +186,6 @@ public class GUI_Server extends javax.swing.JFrame {
             public void run() {
                 GUI_Server gui = new GUI_Server();
                 gui.setVisible(true);
-                new Login(gui).setVisible(true);
             }
         });
     }
