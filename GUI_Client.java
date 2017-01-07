@@ -16,8 +16,8 @@ public class GUI_Client extends javax.swing.JFrame {
 
     //--Class Variables
     static String NAME = "";
-    static String IP = "127.0.0.1";
     static int PORT = 6060;
+    static String IP = "127.0.0.1";
 
     /**
      * Creates new form GUI_Client
@@ -196,6 +196,7 @@ public class GUI_Client extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Client " + client.getPort());
         append("Welcome to the chat room!\n");
+        append("Type 'bye' to leave chat room.\n");
     }
 
     private void btn_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sendActionPerformed
@@ -206,7 +207,6 @@ public class GUI_Client extends javax.swing.JFrame {
             client.sendTo(msg, lbl_chat.getText());
         }
         if (msg.equals("bye")) {
-            append("To re-enter chat room click 'Reconnect'.\n");
             client.stop();
             btn_reconnect.setEnabled(true);
             return;
@@ -228,7 +228,6 @@ public class GUI_Client extends javax.swing.JFrame {
                 append("Me : " + msg + "\n");
             }
             if (msg.equals("bye")) {
-                append("To re-enter chat room click 'Reconnect'.\n");
                 client.stop();
                 btn_reconnect.setEnabled(true);
                 return;

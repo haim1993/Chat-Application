@@ -50,6 +50,7 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             this.gui.append("Server stopped working. \n");
+            this.gui.append("To re-enter chat room click 'Reconnect'.\n");
             this.gui.btn_reconnect.setEnabled(true);
             dlm.removeAllElements();
             this.gui.updateOnlineClients(dlm);
@@ -78,10 +79,11 @@ public class Client implements Runnable {
             dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            this.gui.append("Server stopped working. \n");
-            this.gui.btn_reconnect.setEnabled(true);
-            dlm.removeAllElements();
-            this.gui.updateOnlineClients(dlm);
+//            this.gui.append("Server stopped working. \n");
+//            this.gui.append("To re-enter chat room click 'Reconnect'.\n");
+//            this.gui.btn_reconnect.setEnabled(true);
+//            dlm.removeAllElements();
+//            this.gui.updateOnlineClients(dlm);
         }
     }
 
