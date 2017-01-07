@@ -13,17 +13,19 @@ import javax.swing.DefaultListModel;
 
 /**
  *
- * @author Shlez
+ * @author Haim & Noa
  */
 public class Server implements Runnable {
 
     private class ConnectionToClient implements Runnable {
 
+        //--Object Variables
         private Socket client;
         private DataInputStream dis;
         private DataOutputStream dos;
         private GUI_Server gui;
 
+        //--Constructor
         private ConnectionToClient(Socket client, GUI_Server gui) {
             this.client = client;
             this.gui = gui;
@@ -33,9 +35,9 @@ public class Server implements Runnable {
         public void run() {
             try {
                 dis = new DataInputStream(client.getInputStream());
-                findMessage();
+                outputMessages();
                 String msg;
-                while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
+                while ((isAlive()) && ((msg = dis.readUTF()) != null)) {
                     try {
                         messages.put(msg);
                     } catch (InterruptedException ex) {
@@ -53,13 +55,19 @@ public class Server implements Runnable {
             }
         }
 
-        public void findMessage() {
+        /*
+         * All the messages sent by the clients are recieved by the server.
+         * here we open a new thread and call methods that regulate the messages
+         * to the correct client.
+         */
+        public void outputMessages() {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         dos = new DataOutputStream(client.getOutputStream());
-                        myMessages();
+                        sendNewUpdatedList(dos);
+                        sendOutMyMessages();
                     } catch (IOException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -67,25 +75,18 @@ public class Server implements Runnable {
             }).start();
         }
 
-        public void myMessages() {
-            while (!client.isClosed()) {
-                try {
-                    dos.writeUTF(dlm.toString());
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        /*
+         * In this method we send out the messages to the
+         * right designation. If direct messaging or broadcast.
+         */
+        public void sendOutMyMessages() {
+            while (isAlive()) {
                 BlockingQueue<String> queue = new LinkedBlockingQueue<>();
                 copyQueue(queue);
                 int size = queue.size();
                 for (int i = 0; i < size; i++) {
                     try {
                         String msg = queue.take();
-
                         int clientPort = parseMessageDesignation(msg);
                         String message = passMessage(msg);
                         if (clientPort == client.getPort()) { //--The message will be send solely to this port.
@@ -98,7 +99,7 @@ public class Server implements Runnable {
                         } else if (clientPort == (-1)) { //--Broadcast. Send to all ports.
                             try {
                                 dos.writeUTF(message);
-                                Thread.sleep(100); //--To prevent deleting a broadcast message too fast.
+                                Thread.sleep(250); //--To prevent deleting a broadcast message too fast.
                             } catch (IOException ex) {
                                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -112,6 +113,35 @@ public class Server implements Runnable {
                     }
                 }
             }
+        }
+
+        /*
+         * Opens a new thread that continuously runs and send to client
+         * the most updated online list.
+         */
+        public void sendNewUpdatedList(DataOutputStream dos) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (isAlive()) {
+                        try {
+                            dos.writeUTF(dlm.toString());
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    try {
+                        client.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }).start();
         }
 
         /*
@@ -163,9 +193,9 @@ public class Server implements Runnable {
             String port = parseMessageSource(str) + "";
             return port + " : " + str.substring(start + 2);
         }
-
     }
 
+    //--Object Variables
     private ServerSocket server;
     private Socket client;
     private DefaultListModel<String> dlm;
@@ -174,6 +204,7 @@ public class Server implements Runnable {
     private boolean ALIVE = false;
     private BlockingQueue<String> messages;
 
+    //--Constructor
     public Server(int port, GUI_Server gui) {
         try {
             this.server = new ServerSocket(port);
@@ -191,7 +222,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         this.ALIVE = true;
-        while (ALIVE) {
+        while (isAlive()) {
             try {
                 this.client = this.server.accept();
                 addClient(client);
@@ -245,8 +276,7 @@ public class Server implements Runnable {
     public void stop() {
         this.ALIVE = false;
         try {
-            this.client.close();
-            //this.server.close();
+            this.server.close();
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }

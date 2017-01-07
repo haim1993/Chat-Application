@@ -7,11 +7,14 @@ import javax.swing.text.DefaultCaret;
 
 /**
  *
- * @author Shlez
+ * @author Haim & Noa
  */
 public class GUI_Client extends javax.swing.JFrame {
 
+    //--Object Variables
     private Client client;
+
+    //--Class Variables
     static String NAME = "";
     static String IP = "127.0.0.1";
     static int PORT = 6060;
@@ -198,8 +201,10 @@ public class GUI_Client extends javax.swing.JFrame {
     private void btn_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sendActionPerformed
         String msg = txt_send.getText();
         txt_send.setText("");
-        append("Me : " + msg + "\n");
-        client.sendTo(msg, lbl_chat.getText());
+        if (!msg.equals("")) {
+            append("Me : " + msg + "\n");
+            client.sendTo(msg, lbl_chat.getText());
+        }
         if (msg.equals("bye")) {
             append("To re-enter chat room click 'Reconnect'.\n");
             client.stop();
@@ -218,8 +223,10 @@ public class GUI_Client extends javax.swing.JFrame {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             String msg = txt_send.getText();
             txt_send.setText("");
-            append("Me : " + msg + "\n");
-            client.sendTo(msg, lbl_chat.getText());
+            if (!msg.equals("")) {
+                client.sendTo(msg, lbl_chat.getText());
+                append("Me : " + msg + "\n");
+            }
             if (msg.equals("bye")) {
                 append("To re-enter chat room click 'Reconnect'.\n");
                 client.stop();
@@ -232,6 +239,8 @@ public class GUI_Client extends javax.swing.JFrame {
     private void btn_reconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_reconnectActionPerformed
         startClient();
         btn_reconnect.setEnabled(false);
+        txt_send.setText("");
+        txt_send.requestFocusInWindow();
     }//GEN-LAST:event_btn_reconnectActionPerformed
 
     private void list_onlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_onlineMouseClicked
@@ -240,7 +249,6 @@ public class GUI_Client extends javax.swing.JFrame {
             txt_send.setText("");
             txt_send.requestFocusInWindow();
         }
-
     }//GEN-LAST:event_list_onlineMouseClicked
 
     /*
@@ -258,8 +266,7 @@ public class GUI_Client extends javax.swing.JFrame {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (client.isAlive()) {
-                    DefaultListModel<String> tempDLM = new DefaultListModel<String>();
+                    DefaultListModel<String> tempDLM = new DefaultListModel<>();
                     tempDLM.addElement("Broadcast");
                     for (int i = 0; i < dlm.size(); i++) {
                         if (!dlm.elementAt(i).equals(client.getPort() + "")) {
@@ -268,17 +275,16 @@ public class GUI_Client extends javax.swing.JFrame {
                     }
                     list_online.setModel(tempDLM);
                     try {
-                        Thread.sleep(250);
+                        Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            }
         }).start();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_reconnect;
+    javax.swing.JButton btn_reconnect;
     private javax.swing.JButton btn_send;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;

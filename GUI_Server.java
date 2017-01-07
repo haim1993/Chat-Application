@@ -1,15 +1,16 @@
 
-import javax.swing.DefaultListModel;
 import javax.swing.text.DefaultCaret;
 
 /**
  *
- * @author Shlez
+ * @author Haim & Noa
  */
 public class GUI_Server extends javax.swing.JFrame {
 
+    //--Object Variables
     private Server server;
 
+    //--Class Variables
     static int PORT = 6060;
     static String IP = "127.0.0.1";
 
@@ -18,7 +19,6 @@ public class GUI_Server extends javax.swing.JFrame {
      */
     public GUI_Server() {
         initComponents();
-        server = new Server(PORT, this);
         startServer();
     }
 
@@ -115,6 +115,7 @@ public class GUI_Server extends javax.swing.JFrame {
      * This method calls the thread in object Server.
      */
     private void startServer() {
+        server = new Server(PORT, this);
         new Thread(server).start();
         append("Waiting for clients...\n");
     }
@@ -128,7 +129,6 @@ public class GUI_Server extends javax.swing.JFrame {
     private void btn_stopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_stopActionPerformed
         btn_stop.setVisible(false);
         btn_start.setVisible(true);
-        append("Server stopped working.\n");
         server.stop();
     }//GEN-LAST:event_btn_stopActionPerformed
 
@@ -137,13 +137,6 @@ public class GUI_Server extends javax.swing.JFrame {
      */
     public void append(String message) {
         txtArea_chat.append(message);
-    }
-
-    /*
-     * Return most updated online contact list.
-     */
-    public DefaultListModel<String> getList() {
-        return server.getClientList();
     }
 
     /*

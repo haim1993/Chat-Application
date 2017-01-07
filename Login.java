@@ -1,7 +1,7 @@
 
 /**
  *
- * @author Shlez
+ * @author Haim & Noa
  */
 public class Login extends javax.swing.JFrame {
 

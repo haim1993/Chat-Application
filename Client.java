@@ -9,10 +9,11 @@ import javax.swing.DefaultListModel;
 
 /**
  *
- * @author Shlez
+ * @author Haim & Noa
  */
 public class Client implements Runnable {
 
+    //--Object Variables 
     private Socket client;
     private DataInputStream dis;
     private DataOutputStream dos;
@@ -20,6 +21,7 @@ public class Client implements Runnable {
     private DefaultListModel<String> dlm;
     private boolean ALIVE = false;
 
+    //--Constructor
     public Client(String IPAddress, int port, GUI_Client gui) {
         this.ALIVE = true;
         try {
@@ -47,6 +49,10 @@ public class Client implements Runnable {
             }
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            this.gui.append("Server stopped working. \n");
+            this.gui.btn_reconnect.setEnabled(true);
+            dlm.removeAllElements();
+            this.gui.updateOnlineClients(dlm);
         }
     }
 
@@ -61,7 +67,6 @@ public class Client implements Runnable {
         for (String port : ports) {
             dlm.addElement(port);
         }
-
     }
 
     /*
@@ -73,6 +78,10 @@ public class Client implements Runnable {
             dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            this.gui.append("Server stopped working. \n");
+            this.gui.btn_reconnect.setEnabled(true);
+            dlm.removeAllElements();
+            this.gui.updateOnlineClients(dlm);
         }
     }
 
