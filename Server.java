@@ -277,6 +277,7 @@ public class Server implements Runnable {
      */
     public void removeClient(Socket client) {
         dlm.remove(dlm.indexOf(users.get(client.getPort() + "") + ""));
+        users.remove(client.getPort() + "");
     }
 
     /*

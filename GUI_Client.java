@@ -264,7 +264,7 @@ public class GUI_Client extends javax.swing.JFrame {
     public String getName() {
         return this.NAME;
     }
-    
+
     /*
      * Runs a thread that continuously updates the contact
      * list on the client side.
@@ -281,6 +281,10 @@ public class GUI_Client extends javax.swing.JFrame {
                     }
                 }
                 list_online.setModel(tempDLM);
+                if (!tempDLM.contains(lbl_chat.getText())) {
+                    lbl_chat.setText("Broadcast");
+                }
+                
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
