@@ -338,7 +338,9 @@ public class Login extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new GUI_Client(name, ip).setVisible(true);
+                GUI_Client gui = new GUI_Client(name, ip);
+                gui.setVisible(true);
+                gui.startClient();
             }
         });
     }

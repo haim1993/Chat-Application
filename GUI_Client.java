@@ -24,7 +24,7 @@ public class GUI_Client extends javax.swing.JFrame {
         initComponents();
         this.NAME = name;
         this.IP = ip;
-        startClient();
+        initializeClient();
     }
 
     /**
@@ -189,13 +189,20 @@ public class GUI_Client extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     /*
-     * Starts the client socket.
+     * Initializes the name on title to be the inputed name, and set
+     * default close operation.
      */
-    private void startClient() {
-        client = new Client(IP, PORT, this);
-        new Thread(client).start();
+    private void initializeClient() {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle(this.NAME);
+    }
+    
+    /*
+     * Starts the client socket.
+     */
+    public void startClient() {
+        client = new Client(IP, PORT, this);
+        new Thread(client).start();
         append("Welcome to the chat room!\n");
         append("Type 'bye' to leave chat room.\n");
     }

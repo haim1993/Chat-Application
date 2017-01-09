@@ -29,6 +29,8 @@ public class Client implements Runnable {
             this.gui = gui;
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            gui.btn_reconnect.setEnabled(true);
+            this.stop();
         }
         dlm = new DefaultListModel<>();
     }
@@ -54,6 +56,7 @@ public class Client implements Runnable {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             this.gui.append("Server stopped working. \n");
             this.gui.append("To re-enter chat room click 'Reconnect'.\n");
+            System.out.println("Do I see this?");
             this.gui.btn_reconnect.setEnabled(true);
             dlm.removeAllElements();
             this.gui.updateOnlineClients(dlm);
