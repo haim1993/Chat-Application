@@ -1,15 +1,32 @@
 
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+
 /**
  *
  * @author Haim & Noa
  */
 public class Login extends javax.swing.JFrame {
 
+    private String name = "";
+    private String ip = "";
+    private ArrayList<String> list;
+    private Border[] border = new Border[5];
+
     /**
      * Creates new form Login
      */
     public Login() {
         initComponents();
+        list = new ArrayList<>();
+        border[0] = txt_ip_1.getBorder();
+        border[1] = txt_ip_2.getBorder();
+        border[2] = txt_ip_3.getBorder();
+        border[3] = txt_ip_4.getBorder();
+        border[4] = txt_name.getBorder();
     }
 
     /**
@@ -25,9 +42,18 @@ public class Login extends javax.swing.JFrame {
         lbl_name = new javax.swing.JLabel();
         lbl_ip = new javax.swing.JLabel();
         txt_name = new javax.swing.JTextField();
-        txt_ip = new javax.swing.JTextField();
+        txt_ip_2 = new javax.swing.JTextField();
+        txt_ip_3 = new javax.swing.JTextField();
+        txt_ip_1 = new javax.swing.JTextField();
+        txt_ip_4 = new javax.swing.JTextField();
+        lbl_dot_1 = new javax.swing.JLabel();
+        lbl_dot_2 = new javax.swing.JLabel();
+        lbl_dot_3 = new javax.swing.JLabel();
+        lbl_error = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Login");
+        setResizable(false);
 
         btn_connect.setText("Connect");
         btn_connect.addActionListener(new java.awt.event.ActionListener() {
@@ -42,55 +68,250 @@ public class Login extends javax.swing.JFrame {
         lbl_ip.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         lbl_ip.setText("IP");
 
+        txt_name.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txt_nameFocusGained(evt);
+            }
+        });
+        txt_name.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_nameKeyPressed(evt);
+            }
+        });
+
+        txt_ip_2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txt_ip_2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txt_ip_2FocusGained(evt);
+            }
+        });
+
+        txt_ip_3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txt_ip_3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txt_ip_3FocusGained(evt);
+            }
+        });
+
+        txt_ip_1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txt_ip_1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txt_ip_1FocusGained(evt);
+            }
+        });
+
+        txt_ip_4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txt_ip_4.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txt_ip_4FocusGained(evt);
+            }
+        });
+
+        lbl_dot_1.setText(".");
+
+        lbl_dot_2.setText(".");
+
+        lbl_dot_3.setText(".");
+
+        lbl_error.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
+        lbl_error.setForeground(new java.awt.Color(255, 0, 0));
+        lbl_error.setText(" ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btn_connect, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbl_name)
-                            .addComponent(lbl_ip))
+                        .addComponent(lbl_ip)
+                        .addGap(49, 49, 49)
+                        .addComponent(txt_ip_1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbl_dot_1)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_ip_2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbl_dot_2)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_ip_3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(lbl_dot_3)
+                        .addGap(0, 0, 0)
+                        .addComponent(txt_ip_4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbl_name)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txt_name, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                            .addComponent(txt_ip))))
-                .addGap(0, 10, Short.MAX_VALUE))
+                            .addComponent(lbl_error, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txt_name, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(10, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_ip)
+                    .addComponent(txt_ip_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_ip_2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_ip_3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_ip_4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_dot_1)
+                    .addComponent(lbl_dot_2)
+                    .addComponent(lbl_dot_3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbl_name)
                     .addComponent(txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_ip)
-                    .addComponent(txt_ip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(0, 0, 0)
+                .addComponent(lbl_error)
+                .addGap(0, 0, 0)
                 .addComponent(btn_connect)
-                .addGap(10, 10, 10))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_connectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_connectActionPerformed
-        String name = txt_name.getText();
-        txt_name.setText("");
-        String ip = txt_ip.getText();
-        txt_ip.setText("");
-        this.startClient();
+        if (checkIP(txt_ip_1.getText())) {
+            if (checkIP(txt_ip_2.getText())) {
+                if (checkIP(txt_ip_3.getText())) {
+                    if (checkIP(txt_ip_4.getText())) {
+                        this.ip = getIP();
+                        if (!txt_name.getText().equals("")) {
+                            if (!list.contains(txt_name.getText())) {
+                                this.name = txt_name.getText();
+                                list.add(this.name);
+                                this.startClient(this.name, this.ip);
+                            } else {
+                                lbl_error.setText("Name already exist.");
+                                txt_name.setBorder(BorderFactory.createLineBorder(Color.red));
+                            }
+                        } else {
+                            lbl_error.setText("NAME field is empty.");
+                            txt_name.setBorder(BorderFactory.createLineBorder(Color.red));
+                        }
+                    } else {
+                        lbl_error.setText("IP field 4 is incorrect.");
+                        txt_ip_4.setBorder(BorderFactory.createLineBorder(Color.red));
+                    }
+                } else {
+                    lbl_error.setText("IP field 3 is incorrect.");
+                    txt_ip_3.setBorder(BorderFactory.createLineBorder(Color.red));
+                }
+            } else {
+                lbl_error.setText("IP field 2 is incorrect.");
+                txt_ip_2.setBorder(BorderFactory.createLineBorder(Color.red));
+            }
+        } else {
+            lbl_error.setText("IP field 1 is incorrect.");
+            txt_ip_1.setBorder(BorderFactory.createLineBorder(Color.red));
+        }
     }//GEN-LAST:event_btn_connectActionPerformed
+
+    private void txt_nameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_nameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (checkIP(txt_ip_1.getText())) {
+                if (checkIP(txt_ip_2.getText())) {
+                    if (checkIP(txt_ip_3.getText())) {
+                        if (checkIP(txt_ip_4.getText())) {
+                            this.ip = getIP();
+                            if (!txt_name.getText().equals("")) {
+                                if (!list.contains(txt_name.getText())) {
+                                    this.name = txt_name.getText();
+                                    list.add(this.name);
+                                    this.startClient(this.name, this.ip);
+                                } else {
+                                    lbl_error.setText("Name already exist.");
+                                    txt_name.setBorder(BorderFactory.createLineBorder(Color.red));
+                                }
+                            } else {
+                                lbl_error.setText("NAME field is empty.");
+                                txt_name.setBorder(BorderFactory.createLineBorder(Color.red));
+                            }
+                        } else {
+                            lbl_error.setText("IP field 4 is incorrect.");
+                            txt_ip_4.setBorder(BorderFactory.createLineBorder(Color.red));
+                        }
+                    } else {
+                        lbl_error.setText("IP field 3 is incorrect.");
+                        txt_ip_3.setBorder(BorderFactory.createLineBorder(Color.red));
+                    }
+                } else {
+                    lbl_error.setText("IP field 2 is incorrect.");
+                    txt_ip_2.setBorder(BorderFactory.createLineBorder(Color.red));
+                }
+            } else {
+                lbl_error.setText("IP field 1 is incorrect.");
+                txt_ip_1.setBorder(BorderFactory.createLineBorder(Color.red));
+            }
+        }
+    }//GEN-LAST:event_txt_nameKeyPressed
+
+    private void txt_nameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_nameFocusGained
+        lbl_error.setText(" ");
+        txt_ip_1.setBorder(border[0]);
+        txt_ip_2.setBorder(border[1]);
+        txt_ip_3.setBorder(border[2]);
+        txt_ip_4.setBorder(border[3]);
+        txt_name.setBorder(border[4]);
+    }//GEN-LAST:event_txt_nameFocusGained
+
+    private void txt_ip_1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ip_1FocusGained
+        lbl_error.setText(" ");
+        txt_ip_1.setBorder(border[0]);
+        txt_ip_2.setBorder(border[1]);
+        txt_ip_3.setBorder(border[2]);
+        txt_ip_4.setBorder(border[3]);
+        txt_name.setBorder(border[4]);
+    }//GEN-LAST:event_txt_ip_1FocusGained
+
+    private void txt_ip_2FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ip_2FocusGained
+        lbl_error.setText(" ");
+        txt_ip_1.setBorder(border[0]);
+        txt_ip_2.setBorder(border[1]);
+        txt_ip_3.setBorder(border[2]);
+        txt_ip_4.setBorder(border[3]);
+        txt_name.setBorder(border[4]);
+    }//GEN-LAST:event_txt_ip_2FocusGained
+
+    private void txt_ip_3FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ip_3FocusGained
+        lbl_error.setText(" ");
+        txt_ip_1.setBorder(border[0]);
+        txt_ip_2.setBorder(border[1]);
+        txt_ip_3.setBorder(border[2]);
+        txt_ip_4.setBorder(border[3]);
+        txt_name.setBorder(border[4]);
+    }//GEN-LAST:event_txt_ip_3FocusGained
+
+    private void txt_ip_4FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_ip_4FocusGained
+        lbl_error.setText(" ");
+        txt_ip_1.setBorder(border[0]);
+        txt_ip_2.setBorder(border[1]);
+        txt_ip_3.setBorder(border[2]);
+        txt_ip_4.setBorder(border[3]);
+        txt_name.setBorder(border[4]);
+    }//GEN-LAST:event_txt_ip_4FocusGained
+
+    /*
+     * Return IP in the correct form & set old to empty.
+     */
+    public String getIP() {
+        String ip_1 = txt_ip_1.getText();
+        String ip_2 = txt_ip_2.getText();
+        String ip_3 = txt_ip_3.getText();
+        String ip_4 = txt_ip_4.getText();
+        return ip_1 + "." + ip_2 + "." + ip_3 + "." + ip_4;
+    }
 
     /*
      * Starts the client GUI.
      */
-    public void startClient() {
+    public void startClient(String name, String ip) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -117,16 +338,41 @@ public class Login extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new GUI_Client().setVisible(true);
+                new GUI_Client(name, ip).setVisible(true);
             }
         });
     }
 
+    /*
+     * Check for bad IP input.
+     */
+    public boolean checkIP(String ip) {
+        if (ip.equals("")) {
+            return false;
+        }
+        if (ip.matches("[0-9]+")) {
+            int number = Integer.parseInt(ip);
+            if (number > 255 || number < 0) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_connect;
+    private javax.swing.JLabel lbl_dot_1;
+    private javax.swing.JLabel lbl_dot_2;
+    private javax.swing.JLabel lbl_dot_3;
+    private javax.swing.JLabel lbl_error;
     private javax.swing.JLabel lbl_ip;
     private javax.swing.JLabel lbl_name;
-    private javax.swing.JTextField txt_ip;
+    private javax.swing.JTextField txt_ip_1;
+    private javax.swing.JTextField txt_ip_2;
+    private javax.swing.JTextField txt_ip_3;
+    private javax.swing.JTextField txt_ip_4;
     private javax.swing.JTextField txt_name;
     // End of variables declaration//GEN-END:variables
 
@@ -144,16 +390,24 @@ public class Login extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 

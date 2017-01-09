@@ -4,7 +4,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -38,21 +39,34 @@ public class Server implements Runnable {
                 outputMessages();
                 String msg;
                 while ((isAlive()) && ((msg = dis.readUTF()) != null)) {
-                    try {
-                        messages.put(msg);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (msg.equals("bye")) {
-                        break;
+                    if ((msg.charAt(0) == '{') && (msg.charAt(msg.length() - 1) == '}')) {
+                        addNameToPort(msg);
+                        this.gui.append(users.get(client.getPort() + "") + " joined.\n");
+                        addClient(client);
+                    } else {
+                        try {
+                            messages.put(msg);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ConnectionToClient.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
-                this.gui.append(client.getPort() + " left.\n");
+                this.gui.append(users.get(client.getPort() + "") + " left.\n");
                 removeClient(client);
             }
+        }
+
+        /*
+         * Add to HashTable port number and name as value.
+         */
+        public void addNameToPort(String str) {
+            int index = str.indexOf(',');
+            String port = str.substring(1, index);
+            String name = str.substring(index + 1, str.length() - 1);
+            users.put(port, name);
         }
 
         /*
@@ -89,7 +103,7 @@ public class Server implements Runnable {
                         String msg = queue.take();
                         int clientPort = parseMessageDesignation(msg);
                         String message = passMessage(msg);
-                        if (clientPort == client.getPort()) { //--The message will be send solely to this port.
+                        if (clientPort == client.getPort()) { //--The message will be sent solely to this port.
                             try {
                                 dos.writeUTF(message);
                             } catch (IOException ex) {
@@ -99,7 +113,7 @@ public class Server implements Runnable {
                         } else if (clientPort == (-1)) { //--Broadcast. Send to all ports.
                             try {
                                 dos.writeUTF(message);
-                                Thread.sleep(250); //--To prevent deleting a broadcast message too fast.
+                                Thread.sleep(250); //--To prevent a broadcast message from not appearing.
                             } catch (IOException ex) {
                                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -166,11 +180,23 @@ public class Server implements Runnable {
         public int parseMessageDesignation(String message) {
             int start = message.indexOf('<');
             int end = message.indexOf('>');
-            String port = message.substring(start + 1, end);
-            if (!port.equals("Broadcast")) {
-                return Integer.parseInt(port);
+            String name = message.substring(start + 1, end);
+            if (name.equals("Broadcast")) {
+                return -1;
             }
-            return -1;
+           return Integer.parseInt(getKey(users, name));
+        }
+
+        /*
+         * Return port number (Key) from HashTable.
+         */
+        public String getKey(HashMap<String, String> map, String name) {
+            for (Entry<String, String> entry : map.entrySet()) {
+                if (entry.getValue().equals(name)) {
+                    return entry.getKey();
+                }
+            }
+            return null;
         }
 
         /*
@@ -179,7 +205,7 @@ public class Server implements Runnable {
          */
         public int parseMessageSource(String message) {
             int start = message.indexOf('(');
-            int end = message.indexOf(')');
+            int end = message.indexOf(',');
             String port = message.substring(start + 1, end);
             return Integer.parseInt(port);
         }
@@ -191,7 +217,8 @@ public class Server implements Runnable {
         public String passMessage(String str) {
             int start = str.indexOf('>');
             String port = parseMessageSource(str) + "";
-            return port + " : " + str.substring(start + 2);
+            String message = port + ";" + users.get(port) + " : " + str.substring(start + 2);
+            return message;
         }
     }
 
@@ -199,16 +226,15 @@ public class Server implements Runnable {
     private ServerSocket server;
     private Socket client;
     private DefaultListModel<String> dlm;
-    private ArrayList<String> serverMessages;
     private GUI_Server gui;
     private boolean ALIVE = false;
     private BlockingQueue<String> messages;
+    private HashMap<String, String> users;
 
     //--Constructor
     public Server(int port, GUI_Server gui) {
         try {
             this.server = new ServerSocket(port);
-
         } catch (IOException ex) {
             Logger.getLogger(Server.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -217,6 +243,7 @@ public class Server implements Runnable {
         this.gui = gui;
         this.ALIVE = true;
         messages = new LinkedBlockingQueue<>();
+        users = new HashMap<>();
     }
 
     @Override
@@ -225,14 +252,9 @@ public class Server implements Runnable {
         while (isAlive()) {
             try {
                 this.client = this.server.accept();
-                addClient(client);
-                gui.updateOnlineClients();
-                this.gui.append(client.getPort() + " joined.\n");
-
                 ConnectionToClient connectToClient = new ConnectionToClient(client, gui);
                 Thread th = new Thread(connectToClient);
                 th.start();
-
             } catch (IOException ex) {
                 Logger.getLogger(Server.class
                         .getName()).log(Level.SEVERE, null, ex);
@@ -246,14 +268,15 @@ public class Server implements Runnable {
      * Add client to the online client list.
      */
     public void addClient(Socket client) {
-        dlm.addElement(client.getPort() + "");
+        dlm.addElement(users.get(client.getPort() + "") + "");
+        gui.updateOnlineClients();
     }
 
     /*
      * Removes client from the online client list.
      */
     public void removeClient(Socket client) {
-        dlm.remove(dlm.indexOf(client.getPort() + ""));
+        dlm.remove(dlm.indexOf(users.get(client.getPort() + "") + ""));
     }
 
     /*

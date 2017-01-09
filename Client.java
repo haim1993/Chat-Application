@@ -38,12 +38,15 @@ public class Client implements Runnable {
         try {
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
+            dos.writeUTF("{" + getPort() + "," + this.gui.getName() + "}");
             String msg;
             while ((ALIVE) && ((msg = dis.readUTF()) != null)) {
                 if ((msg.charAt(0) == '[') && (msg.charAt(msg.length() - 1) == ']')) {
                     convertStringToList(msg);
                     gui.updateOnlineClients(this.dlm);
                 } else if (parseMessageSource(msg) != client.getLocalPort()) {
+                    int index = msg.indexOf(';');
+                    msg = msg.substring(index + 1);
                     this.gui.append(msg + "\n");
                 }
             }
@@ -76,14 +79,9 @@ public class Client implements Runnable {
      */
     public void sendTo(String message, String designation) {
         try {
-            dos.writeUTF("(" + this.getPort() + ")<" + designation + "> " + message);
+            dos.writeUTF("(" + this.getPort() + "," + gui.getName() + ")<" + designation + "> " + message);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//            this.gui.append("Server stopped working. \n");
-//            this.gui.append("To re-enter chat room click 'Reconnect'.\n");
-//            this.gui.btn_reconnect.setEnabled(true);
-//            dlm.removeAllElements();
-//            this.gui.updateOnlineClients(dlm);
         }
     }
 
@@ -118,8 +116,8 @@ public class Client implements Runnable {
      * the source of the message (Port number of sender).
      */
     public int parseMessageSource(String message) {
-        int start = message.indexOf(':');
-        String port = message.substring(0, start - 1);
+        int end = message.indexOf(';');
+        String port = message.substring(0, end);
         return Integer.parseInt(port);
     }
 

@@ -13,17 +13,17 @@ public class GUI_Client extends javax.swing.JFrame {
 
     //--Object Variables
     private Client client;
-
-    //--Class Variables
-    static String NAME = "";
-    static int PORT = 6060;
-    static String IP = "127.0.0.1";
+    private String NAME = "";
+    private int PORT = 6060;
+    private String IP = "";
 
     /**
      * Creates new form GUI_Client
      */
-    public GUI_Client() {
+    public GUI_Client(String name, String ip) {
         initComponents();
+        this.NAME = name;
+        this.IP = ip;
         startClient();
     }
 
@@ -50,6 +50,7 @@ public class GUI_Client extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Client");
+        setResizable(false);
 
         panel_chat.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(102, 102, 102), 1, true));
 
@@ -194,7 +195,7 @@ public class GUI_Client extends javax.swing.JFrame {
         client = new Client(IP, PORT, this);
         new Thread(client).start();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Client " + client.getPort());
+        setTitle(this.NAME);
         append("Welcome to the chat room!\n");
         append("Type 'bye' to leave chat room.\n");
     }
@@ -258,6 +259,13 @@ public class GUI_Client extends javax.swing.JFrame {
     }
 
     /*
+     * Returns the value of the variable NAME.
+     */
+    public String getName() {
+        return this.NAME;
+    }
+    
+    /*
      * Runs a thread that continuously updates the contact
      * list on the client side.
      */
@@ -265,20 +273,20 @@ public class GUI_Client extends javax.swing.JFrame {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                    DefaultListModel<String> tempDLM = new DefaultListModel<>();
-                    tempDLM.addElement("Broadcast");
-                    for (int i = 0; i < dlm.size(); i++) {
-                        if (!dlm.elementAt(i).equals(client.getPort() + "")) {
-                            tempDLM.addElement((String) dlm.elementAt(i));
-                        }
-                    }
-                    list_online.setModel(tempDLM);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
+                DefaultListModel<String> tempDLM = new DefaultListModel<>();
+                tempDLM.addElement("Broadcast");
+                for (int i = 0; i < dlm.size(); i++) {
+                    if (!dlm.elementAt(i).equals(getName() + "")) {
+                        tempDLM.addElement((String) dlm.elementAt(i));
                     }
                 }
+                list_online.setModel(tempDLM);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GUI_Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }).start();
     }
 

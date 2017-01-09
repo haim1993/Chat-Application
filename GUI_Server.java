@@ -41,6 +41,7 @@ public class GUI_Server extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Server");
+        setResizable(false);
 
         txtArea_chat.setColumns(20);
         txtArea_chat.setRows(5);
